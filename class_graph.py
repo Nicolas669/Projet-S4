@@ -1,5 +1,5 @@
 __author__ = "Bernardet, Coruzzi, Laik, Montfort, Rouby, Trouyet"
-__filename__ = "graph"
+__filename__ = "class_graph"
 
 
 class Graph:
@@ -219,6 +219,7 @@ class Graph:
         """ renvoie une liste de liste ou la i-eme liste correspond aux successeurs du i-eme sommet
         sous la forme du tuple (sommet, poids) ou :
         sommet represente le successeur du i-eme sommet et poids represente le poids de l'arete entre sommet et le i-eme sommet """
+        # pour donner un graph a l'algo des voyageurs
         successeurs = []
         vertices = self.getVertices()
         edges = self.getEdges()
