@@ -38,6 +38,7 @@ def actualisation(G,L_marques,L_dis,chem):
 
 #détermine les distances au départ des sommets du graphe jusqu'à ce que le sommet d'arrivée soit sélectionné
 def algo(G):
+    # G = graphe.successeurs()
     n=len(G)
     L_MARQUE=[False]*n
     L_DIS=[0]+[inf]*(n-1)
