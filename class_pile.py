@@ -1,5 +1,5 @@
 __author__ = "Bernardet, Coruzzi, Laik, Montfort, Rouby, Trouyet"
-__filename__ = "pile"
+__filename__ = "class_pile"
 
 
 class Pile:
