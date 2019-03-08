@@ -18,6 +18,7 @@ def recherche_plus_proche(L_marques,L_dis):
 
 #sélectionne le sommet le plus proche du point de départ et met à jour les distances au départ de ses voisins non marqués, puis le marque
 def actualisation(G,L_marques,L_dis,chem):
+    # G = graphe.successeurs()
     n=len(G)
     sommet=recherche_plus_proche(L_marques,L_dis)
 
