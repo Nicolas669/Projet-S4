@@ -1,5 +1,8 @@
 __author__ = "Bernardet, Coruzzi, Laik, Montfort, Rouby, Trouyet"
-__filename__ = "class_graph"
+__filename__ = "graph"
+
+from class_point import *
+from class_pile import *
 
 
 class Graph:
@@ -17,24 +20,24 @@ class Graph:
 
     def __init__(self, vertices, edges):
         """ cree un graph avec :
-         - vertices : liste des sommets (entiers) du graphe
+         - vertices : liste des sommets (Points) du graphe
          - edges : liste des aretes du graphe
          une arrete est representee par le tuple : (sommet1, sommet2, poids)
-         avec sommet1, sommet2 des entiers et poids un reel """
+         avec sommet1, sommet2 des Points et poids un reel """
 
         assert isinstance(vertices, list)
         assert isinstance(edges, list)
 
-        # verifie que les sommets sont des entiers
+        # verifie que les sommets sont de la classe Point
         for i in range(len(vertices)):
-            assert isinstance(vertices[0], int)
+            assert isinstance(vertices[0], Point)
 
-        # verifie que les arretes sont des tuples composes de 2 entiers et 1 reel
+        # verifie que les arretes sont des tuples composes de 2 Points et 1 reel
         for i in range(len(edges)):
             assert isinstance(edges[i], tuple)
             assert len(edges[i]) == 3
-            assert isinstance(edges[i][0], int)  # sommet1 = entier
-            assert isinstance(edges[i][1], int)  # sommet2 = entier
+            assert isinstance(edges[i][0], Point)  # sommet1 = Point
+            assert isinstance(edges[i][1], Point)  # sommet2 = Point
             assert isinstance(edges[i][2], float)  # poids = reel
 
             sommet1_i = edges[i][0]
@@ -75,19 +78,19 @@ class Graph:
         assert isinstance(vertices, list)
 
         for i in range(len(vertices)):
-            assert isinstance(vertices[i], int)
+            assert isinstance(vertices[i], Point)
 
         self.vertices = vertices
 
     def setEdges(self, edges):
         """ change toute la liste des aretes du graphe par la liste edges """
         assert isinstance(edges, list)
-        # verifie que les arretes sont des tuples composes de 2 entiers et 1 reel
+        # verifie que les arretes sont des tuples composes de 2 Points et 1 reel
         for i in range(len(edges)):
             assert isinstance(edges[i], tuple)
             assert len(edges[i]) == 3
-            assert isinstance(edges[i][0], int)  # sommet1 = entier
-            assert isinstance(edges[i][1], int)  # sommet2 = entier
+            assert isinstance(edges[i][0], Point)  # sommet1 = Point
+            assert isinstance(edges[i][1], Point)  # sommet2 = Point
             assert isinstance(edges[i][2], float)  # poids = reel
 
             # verifie que les sommets des nouvelles aretes sont dans la liste des sommets du graphe
@@ -115,8 +118,8 @@ class Graph:
         self.edges = edges
 
     def add_vertex(self, vertex):
-        """ ajoute UN sommet (ENTIER) a la liste des sommets du graphe s'il n'y etait pas """
-        assert isinstance(vertex, int)
+        """ ajoute UN sommet (Point) a la liste des sommets du graphe s'il n'y etait pas """
+        assert isinstance(vertex, Point)
         # ajout de vertex a vertices si pas present
         if vertex not in self.getVertices():
             self.getVertices().append(vertex)
@@ -124,11 +127,11 @@ class Graph:
     def add_edge(self, sommet1, sommet2, poids):
         """ ajoute UNE arete (sommet1, sommet2, poids) a la liste des aretes du graphe si elle n'y etait pas
         ou s'il n'y a pas une autre arete entre sommet1 et sommet2
-        sommet1, sommet2 des entiers et poids reel
+        sommet1, sommet2 des Points et poids reel
         si sommet1, sommet2 ne sont pas dans la liste des sommets du graphe, ils sont ajoutes a la liste """
 
-        assert isinstance(sommet1, int)  # sommet1 = entier
-        assert isinstance(sommet2, int)  # sommet2 = entier
+        assert isinstance(sommet1, Point)  # sommet1 = Point
+        assert isinstance(sommet2, Point)  # sommet2 = Point
         assert isinstance(poids, float)  # poids = reel
         # verifie que l'arete n'est pas entre un meme sommet
         assert sommet1 != sommet2
@@ -215,11 +218,10 @@ class Graph:
 
         return poids
 
-    def successeurs(self): 
+    def successeurs(self):
         """ renvoie une liste de liste ou la i-eme liste correspond aux successeurs du i-eme sommet
         sous la forme du tuple (sommet, poids) ou :
         sommet represente le successeur du i-eme sommet et poids represente le poids de l'arete entre sommet et le i-eme sommet """
-        # pour donner un graph a l'algo des voyageurs
         successeurs = []
         vertices = self.getVertices()
         edges = self.getEdges()
@@ -244,3 +246,80 @@ class Graph:
             successeurs.append(successeurs_vertex)
 
         return successeurs
+
+    def successeurs_sans_poids(self):
+        """ renvoie une liste de liste ou la i-eme liste correspond aux successeurs du i-eme sommet
+        sous la forme du tuple (sommet, poids) ou :
+        sommet represente le successeur du i-eme sommet et poids represente le poids de l'arete entre sommet et le i-eme sommet """
+        successeurs = []
+        vertices = self.getVertices()
+        edges = self.getEdges()
+
+        for i in range(len(vertices)):
+            vertex = vertices[i]
+            successeurs_vertex = []
+            # liste des successeurs pour le sommet vertex / le i-eme sommet sous forme (sommet, poids)
+            for j in range(len(edges)):
+                # sommet de l'arete (autre que le i-eme sommet)
+                if edges[j][0] == vertex:
+                    sommet = edges[j][1]
+                    successeurs_vertex.append(sommet)
+
+                if edges[j][1] == vertex:
+                    sommet = edges[j][0]
+                    successeurs_vertex.append(sommet)
+
+            # ajoute la liste des successeurs du i-eme sommet a la liste des successeurs
+            successeurs.append(successeurs_vertex)
+
+        return successeurs
+
+    def est_atteignable(self, vertex1, vertex2):
+        """ renvoie True s'il existe au moins un chemin entre vertex1 et vertex2 (vertex1 et vertex2 sont dans la meme partie connexe du graphe), False sinon """
+        vertices = self.getVertices()  # liste des sommets du graphe
+        assert vertex1 in vertices
+        assert vertex2 in vertices
+        index_v1 = vertices.index(vertex1)
+        adjacents = {vertex1}  # set de tous les sommets atteignables a partir de vertex1
+        success = set(self.successeurs_sans_poids()[index_v1])
+        adjacents = adjacents | success  # ajout des successeurs de vertex1 dans les atteignables
+        a_etudier = Pile(self.successeurs_sans_poids()[index_v1])  # piles des sommets à étudier = sommets qui ne sont pas des successeurs de vertex1
+        marque = [vertex1]
+        while not a_etudier.isEmpty():
+            vertex = a_etudier.depiler()
+            # ajoute les successeurs des sommets non marques a a_etudier
+            # marque les sommets non marques
+            if vertex not in marque:
+                marque.append(vertex)
+                indice = vertices.index(vertex)
+                success = set(self.successeurs_sans_poids()[indice])
+                adjacents = adjacents | success
+                for voisin in success:
+                    a_etudier.empiler(voisin)
+        if vertex2 in adjacents:
+            return True
+        else:
+            return False
+
+    def est_atteint(self, vertex1, vertex2):
+        vertices = self.getVertices()  # liste des sommets du graphe
+        assert vertex1 in vertices
+        assert vertex2 in vertices
+        index_v1 = vertices.index(vertex1)
+        atteint = self.successeurs_sans_poids()[index_v1]
+        marque = [vertex1]
+        a_etudier = Pile(self.successeurs_sans_poids()[index_v1])  # piles des sommets à étudier = sommets qui ne sont pas des successeurs de vertex1
+
+        while not a_etudier.isEmpty():
+            vertex = a_etudier.depiler()
+            if vertex not in marque:
+                index_vertex = vertices.index(vertex)
+                successeurs = self.successeurs_sans_poids()[index_vertex]
+                marque.append(vertex)
+                for voisin in successeurs:
+                    a_etudier.empiler(voisin)
+                    atteint.append(voisin)
+        for ind in range(len(atteint)):
+            if vertex2 == atteint[ind]:
+                return True
+        return False
