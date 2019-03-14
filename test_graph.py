@@ -312,6 +312,18 @@ class GraphTest(unittest.TestCase):
         value = graph.successeurs()
         expected = [[(copy(self.point2), 3.), (copy(self.point3), 5.), (copy(self.point4), 7.)], [(copy(self.point1), 3.), (copy(self.point3), 10.)], [(copy(self.point1), 5.), (copy(self.point2), 10.)], [(copy(self.point1), 7.)]]
         self.assertEqual(value, expected)
+        
+    def testSuccesseursSansPoidsGraph1234_2(self):
+        graph = copy(self.graph1234_2)
+        value = graph.successeurs_sans_poids()
+        expected = [[copy(self.point2), copy(self.point3), copy(self.point4)], [copy(self.point1), copy(self.point3)], [copy(self.point1), copy(self.point2)], [copy(self.point1)]]
+        self.assertEqual(value, expected)
+        
+    def testSuccesseursSansPoidsGraph123_1(self):
+        graph = copy(self.graph123_1)
+        value = graph.successeurs_sans_poids()
+        expected = [[copy(self.point2), copy(self.point3)], [copy(self.point1)], [copy(self.point1)]]
+        self.assertEqual(value, expected)
 
     def testEstAtteint(self):
         graph = copy(self.graph1234_1)
