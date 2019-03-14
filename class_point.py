@@ -36,3 +36,7 @@ class Point:
         x = (self.getAbscisse() + other.getAbscisse())/2
         y = (self.getOrdonnee() + other.getOrdonnee())/2
         return Point(x, y)
+    
+    def __str__(self):
+        x, y = self.getAbscisse(), self.getOrdonnee()
+        return "Point({},{})".format(x, y)
