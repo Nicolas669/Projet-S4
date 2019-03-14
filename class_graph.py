@@ -248,9 +248,7 @@ class Graph:
         return successeurs
 
     def successeurs_sans_poids(self):
-        """ renvoie une liste de liste ou la i-eme liste correspond aux successeurs du i-eme sommet
-        sous la forme du tuple (sommet, poids) ou :
-        sommet represente le successeur du i-eme sommet et poids represente le poids de l'arete entre sommet et le i-eme sommet """
+        """ renvoie une liste de liste ou la i-eme liste correspond a la liste des sommets successeurs du i-eme sommet """
         successeurs = []
         vertices = self.getVertices()
         edges = self.getEdges()
@@ -274,51 +272,29 @@ class Graph:
 
         return successeurs
 
-    def est_atteignable(self, vertex1, vertex2):
+
+    def est_atteint(self, vertex1, vertex2):
         """ renvoie True s'il existe au moins un chemin entre vertex1 et vertex2 (vertex1 et vertex2 sont dans la meme partie connexe du graphe), False sinon """
         vertices = self.getVertices()  # liste des sommets du graphe
         assert vertex1 in vertices
         assert vertex2 in vertices
         index_v1 = vertices.index(vertex1)
-        adjacents = {vertex1}  # set de tous les sommets atteignables a partir de vertex1
-        success = set(self.successeurs_sans_poids()[index_v1])
-        adjacents = adjacents | success  # ajout des successeurs de vertex1 dans les atteignables
-        a_etudier = Pile(self.successeurs_sans_poids()[index_v1])  # piles des sommets à étudier = sommets qui ne sont pas des successeurs de vertex1
+        atteint = self.successeurs_sans_poids()[index_v1]  # liste des sommets atteignables a partir de vertex1
         marque = [vertex1]
-        while not a_etudier.isEmpty():
-            vertex = a_etudier.depiler()
-            # ajoute les successeurs des sommets non marques a a_etudier
-            # marque les sommets non marques
-            if vertex not in marque:
-                marque.append(vertex)
-                indice = vertices.index(vertex)
-                success = set(self.successeurs_sans_poids()[indice])
-                adjacents = adjacents | success
-                for voisin in success:
-                    a_etudier.empiler(voisin)
-        if vertex2 in adjacents:
-            return True
-        else:
-            return False
+        a_etudier = Pile(self.successeurs_sans_poids()[index_v1])  # piles des sommets a etudier = sommets qui ne sont pas des successeurs de vertex1
 
-    def est_atteint(self, vertex1, vertex2):
-        vertices = self.getVertices()  # liste des sommets du graphe
-        assert vertex1 in vertices
-        assert vertex2 in vertices
-        index_v1 = vertices.index(vertex1)
-        atteint = self.successeurs_sans_poids()[index_v1]
-        marque = [vertex1]
-        a_etudier = Pile(self.successeurs_sans_poids()[index_v1])  # piles des sommets à étudier = sommets qui ne sont pas des successeurs de vertex1
-
-        while not a_etudier.isEmpty():
-            vertex = a_etudier.depiler()
-            if vertex not in marque:
+        while not a_etudier.isEmpty():  # tant que la pile de sommets n'est pas vide
+            vertex = a_etudier.depiler()  # on depile le 1e sommmet de la pile
+            if vertex not in marque:  # si ce sommet n'est pas marque
                 index_vertex = vertices.index(vertex)
                 successeurs = self.successeurs_sans_poids()[index_vertex]
+                # on marque ce sommet
                 marque.append(vertex)
+                # on ajoute les successeurs de ce sommet a la pile a_etudier et a la liste des sommets atteints depuis vertex1
                 for voisin in successeurs:
                     a_etudier.empiler(voisin)
                     atteint.append(voisin)
+        # si vertex2 est dans la liste des sommets atteints depuis vertex, on renvoie True sinon False     
         for ind in range(len(atteint)):
             if vertex2 == atteint[ind]:
                 return True
