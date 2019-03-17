@@ -1,63 +1,74 @@
 
-#transforme un pavage en graphe
-def correspondance(centres,adjacences,départ,arrivée):
-    pass
+from class_point import *
+from class_graph import*
 
 
-
-#fonction qui recherche le sommet le plus proche du départ parmi ceux non marqués
-#L_dis est la liste des distances aux points de départ
-def recherche_plus_proche(L_marques,L_dis):
-    dmin=inf
-    plus_proche=-1
-    for i,d in enumerate(L_dis):
-        if L_marques[i]==False and d<dmin:
-            plus_proche=i
-            dmin=d
+# fonction qui recherche le sommet le plus proche du départ parmi ceux non marqués
+# L_dis est la liste des distances au point de départ
+def recherche_plus_proche(L_marques ,L_dis):
+    dmin = inf
+    plus_proche = -1
+    for i, d in enumerate(L_dis):
+        if L_marques[i] == False and d < dmin:
+            plus_proche = i
+            dmin = d
     return plus_proche
 
-#sélectionne le sommet le plus proche du point de départ et met à jour les distances au départ de ses voisins non marqués, puis le marque
-def actualisation(G,L_marques,L_dis,chem):
-    # G = graphe.successeurs()
-    n=len(G)
-    sommet=recherche_plus_proche(L_marques,L_dis)
 
-    if sommet!=-1 and sommet!=n-1:
-        dis_som_origine=L_dis[sommet]
-        for a in G[sommet]:
-            sp,dis_sommet_sp=a
-            if L_marques[sp]==False:
-                if L_dis[sp]>dis_sommet_sp+dis_som_origine:
-                    L_dis[sp]=dis_sommet_sp+dis_som_origine
-                    chem[sp]=sommet
-        L_marques[sommet]=True
+# sélectionne le sommet le plus proche du point de départ (indpp) et met à jour les distances de ses voisins non marqués, puis marque indpp.
+# si indpp est le sommet d'arrivée, met fin à la boucle de la fonction algo.
+def actualisation(G, L_sommets, L_marques, L_dis, chem, arrive):
+    n = len(L_sommets)
+    indpp = recherche_plus_proche(L_marques, L_dis)
 
-        return(True)
+    if indpp != -1 and indpp != arrive:
+        dis_som_origine = L_dis[indpp]
+        for a in G[indpp]:
+            sp, dis_sommet_sp = a
+            idsp = L_sommets.index(sp)
+            if L_marques[idsp] == False:
+                if L_dis[idsp] > dis_sommet_sp + dis_som_origine:
+                    L_dis[idsp] = dis_sommet_sp + dis_som_origine
+                    chem[idsp] = indpp
+        L_marques[indpp] = True
+        return (True)
     else:
-        return(False)
+        return (False)
 
-#détermine les distances au départ des sommets du graphe jusqu'à ce que le sommet d'arrivée soit sélectionné
-def algo(G):
-    # G = graphe.successeurs()
-    n=len(G)
-    L_MARQUE=[False]*n
-    L_DIS=[0]+[inf]*(n-1)
-    CHEM=[-1]+[-3]*(n-1)
-    cont=True
+
+# Détermine la distance de chaque sommet du graphe par rapport au sommet de départ, jusqu'à ce que le sommet d'arrivée soit sélectionné.
+# Pour faire référence à un sommet, on utilisera son indice dans la liste L_sommets.
+def algo(Graphe, dep, arr):
+    L_sommets = Graphe.getVertices()
+    if dep not in L_sommets or arr not in L_sommets:
+        return "point de départ ou arrivée hors du graphe"
+    G = Graphe.successeurs()
+    n = len(G)
+    inddep = L_sommets.index(dep)
+    indarr = L_sommets.index(arr)
+    L_MARQUE = [False] * n
+    L_DIS = [inf] * inddep + [0] + [inf] * (n - inddep - 1)
+    CHEM = [-3] * inddep + [- 1] + [-3] * (n - inddep - 1)
+    cont = True
     while cont:
-        cont=actualisation(G,L_MARQUE,L_DIS,CHEM)
+        cont = actualisation(G, L_sommets, L_MARQUE, L_DIS, CHEM, indarr)
 
-    #retrouve le chemin le plus court en partant du sommet d'arrivée (n-1) et en allant jusqu'au sommet de départ (0)
-    res=[n-1]
-    k=n-1
-    while k!=0:
-        res=[CHEM[k]]+res
-        k=CHEM[k]
+    # retrouve le chemin le plus court en partant du sommet d'arrivée et en allant jusqu'au sommet de départ (CHEM donne l'indice du sommet précédent de chaque sommet dans le chemin)
+    res = [arr]
+    k = indarr
+    while k != inddep:
+        res = [L_sommets[CHEM[k]]] + res
+        k = CHEM[k]
     return res
 
 
-#inf est valeur représentant la distance infinie
-inf=1000
-EX=[[(1,1),(2,4)],[(0,1),(3,2),(5,1)],[(0,4),(3,2),(4,1)],[(1,2),(2,2),(4,1)],[(2,1),(3,1),(5,3)],[(1,1),(4,3),(6,2)],[(5,2)]]
-EX2=[[(1,8),(3,21),(4,17)],[(0,8),(2,8)],[(1,8),(6,25)],[(0,21),(5,20),(8,10)],[(0,17),(7,50)],[(3,20)],[(2,25),(7,8)],[(6,8),(8,16),(4,50)],[(3,10),(7,16),(9,9)],[(8,9)]]
-print(algo(EX2))
+# inf est valeur représentant la distance infinie
+
+inf = 1000
+p0 = Point(0, 0)
+p1 = Point(0, 1)
+p2 = Point(2, 0)
+p3 = Point(0, 4)
+
+h = Graph([p0, p1, p2, p3], [(p0, p1, 5.0), (p0, p2, 1.0), (p1, p2, 3.0), (p1, p3, 1.0), (p2, p3, 1.0), (p0, p3, 3.0)])
+print(algo(h, p0, p1))
