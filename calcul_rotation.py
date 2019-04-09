@@ -28,6 +28,11 @@ def angle(centre,p2,p3):
     prod_scal=np.dot(u,v)
     norme1=distance(centre,p2)
     norme2=distance(centre,p3)
-    return math.degrees(math.acos(prod_scal/(norme1*norme2)))
+    
+    angle=math.degrees(math.acos(prod_scal/(norme1*norme2)))
+    if x2*y3-x3-y2>0:
+        angle=-angle
+        
+    return angle
 
 print(angle(Point(0,0),Point(1,0),Point(0,1)))
